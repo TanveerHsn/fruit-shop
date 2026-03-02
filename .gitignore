@@ -1,0 +1,2 @@
+uploads/fruits/*
+!uploads/fruits/.gitkeep

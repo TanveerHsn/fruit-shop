@@ -1,0 +1,331 @@
+/* =============================================
+   Fruit Shop – Custom Styles
+   ============================================= */
+
+:root {
+    --primary:   #2e7d32;
+    --primary-l: #43a047;
+    --accent:    #ff6f00;
+    --card-shadow: 0 4px 20px rgba(0,0,0,.08);
+    --hover-shadow: 0 8px 30px rgba(0,0,0,.15);
+}
+
+/* ---------- General ---------- */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f8f9fa;
+    color: #333;
+}
+
+/* ---------- Navbar ---------- */
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+    letter-spacing: .5px;
+}
+.navbar-brand span {
+    color: #a5d6a7;
+}
+
+/* ---------- Hero ---------- */
+.hero-section {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-l) 100%);
+    color: #fff;
+    padding: 80px 0 60px;
+}
+.hero-section h1 { font-size: 2.8rem; font-weight: 700; }
+.hero-section p  { font-size: 1.15rem; opacity: .9; }
+
+/* ---------- Section Heading ---------- */
+.section-heading {
+    position: relative;
+    display: inline-block;
+    font-weight: 700;
+    color: #222;
+}
+.section-heading::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 50px;
+    height: 3px;
+    background: var(--primary);
+    border-radius: 2px;
+}
+
+/* ---------- Fruit Card ---------- */
+.fruit-card {
+    border: none;
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+    transition: transform .25s ease, box-shadow .25s ease;
+    cursor: pointer;
+    overflow: hidden;
+}
+.fruit-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--hover-shadow);
+}
+.fruit-card .card-img-top {
+    height: 200px;
+    object-fit: cover;
+    transition: transform .4s ease;
+}
+.fruit-card:hover .card-img-top {
+    transform: scale(1.06);
+}
+.fruit-card .card-img-wrapper {
+    overflow: hidden;
+    position: relative;
+}
+.fruit-card .card-body {
+    padding: 1.1rem 1.2rem;
+}
+.fruit-card .card-title {
+    font-weight: 600;
+    font-size: 1.05rem;
+    margin-bottom: .3rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Discount badge */
+.discount-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: var(--accent);
+    color: #fff;
+    font-size: .78rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    z-index: 1;
+}
+
+/* Out of stock overlay */
+.out-of-stock-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.out-of-stock-overlay span {
+    background: #f44336;
+    color: #fff;
+    font-size: .85rem;
+    font-weight: 700;
+    padding: 5px 14px;
+    border-radius: 20px;
+    letter-spacing: .5px;
+}
+
+/* Pricing */
+.price-actual {
+    text-decoration: line-through;
+    color: #9e9e9e;
+    font-size: .9rem;
+}
+.price-discounted {
+    color: var(--primary);
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+.price-no-discount {
+    color: var(--primary);
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+/* Category pill */
+.category-pill {
+    background: #e8f5e9;
+    color: var(--primary);
+    font-size: .72rem;
+    font-weight: 600;
+    padding: 2px 10px;
+    border-radius: 12px;
+    display: inline-block;
+}
+
+/* ---------- Detail Page ---------- */
+.detail-image-main {
+    border-radius: 16px;
+    width: 100%;
+    height: 380px;
+    object-fit: cover;
+    box-shadow: var(--card-shadow);
+}
+.thumb-gallery {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+.thumb-gallery img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 10px;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: border-color .2s, transform .2s;
+}
+.thumb-gallery img:hover,
+.thumb-gallery img.active {
+    border-color: var(--primary);
+    transform: scale(1.08);
+}
+.detail-price-box {
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: var(--card-shadow);
+}
+.detail-price-actual {
+    text-decoration: line-through;
+    color: #9e9e9e;
+    font-size: 1rem;
+}
+.detail-price-final {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+.detail-discount-tag {
+    background: var(--accent);
+    color: #fff;
+    font-weight: 700;
+    font-size: .85rem;
+    padding: 4px 14px;
+    border-radius: 20px;
+}
+.stock-badge-in  { background: #e8f5e9; color: var(--primary); }
+.stock-badge-out { background: #ffebee; color: #c62828; }
+.stock-badge {
+    font-size: .85rem;
+    font-weight: 600;
+    padding: 5px 14px;
+    border-radius: 20px;
+    display: inline-block;
+}
+
+/* ---------- No-image placeholder ---------- */
+.no-image-placeholder {
+    background: #f1f3f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #aaa;
+    font-size: 3rem;
+}
+
+/* ---------- Footer ---------- */
+footer {
+    background: #1b5e20;
+    color: rgba(255,255,255,.8);
+}
+footer a { color: #a5d6a7; text-decoration: none; }
+footer a:hover { color: #fff; }
+
+/* ---------- Admin Panel ---------- */
+.admin-sidebar {
+    min-height: 100vh;
+    background: linear-gradient(180deg, var(--primary) 0%, #1b5e20 100%);
+    width: 240px;
+    flex-shrink: 0;
+}
+.admin-sidebar .nav-link {
+    color: rgba(255,255,255,.8);
+    padding: .7rem 1.2rem;
+    border-radius: 8px;
+    margin: 2px 8px;
+    transition: background .2s, color .2s;
+}
+.admin-sidebar .nav-link:hover,
+.admin-sidebar .nav-link.active {
+    background: rgba(255,255,255,.15);
+    color: #fff;
+}
+.admin-content { flex: 1; overflow-y: auto; }
+.admin-topbar {
+    background: #fff;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 14px 24px;
+}
+.admin-card {
+    border: none;
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+}
+
+/* Image upload preview grid */
+.img-preview-grid {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+.img-preview-item {
+    position: relative;
+    width: 100px;
+    height: 100px;
+}
+.img-preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 2px solid #e0e0e0;
+}
+.img-preview-item .remove-img {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 22px;
+    height: 22px;
+    background: #f44336;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    font-size: .7rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Existing image card in edit form */
+.existing-img-card {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid #e0e0e0;
+    background: #fff;
+}
+.existing-img-card img {
+    width: 100%;
+    height: 110px;
+    object-fit: cover;
+}
+.existing-img-card .primary-star {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    background: #ffc107;
+    color: #333;
+    font-size: .65rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 10px;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 576px) {
+    .hero-section h1 { font-size: 2rem; }
+    .detail-image-main { height: 260px; }
+}

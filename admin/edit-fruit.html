@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Edit Fruit – FreshFruits Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+</head>
+<body>
+<div class="d-flex" style="min-height:100vh">
+
+    <!-- Sidebar -->
+    <aside class="admin-sidebar d-flex flex-column py-4">
+        <div class="text-center text-white mb-4 px-3">
+            <i class="bi bi-basket2-fill" style="font-size:2rem"></i>
+            <div class="fw-bold mt-1">FreshFruits</div>
+            <div class="opacity-75 small">Admin Panel</div>
+        </div>
+        <nav class="nav flex-column">
+            <a href="dashboard.html" class="nav-link active">
+                <i class="bi bi-speedometer2 me-2"></i>Dashboard
+            </a>
+            <a href="add-fruit.html" class="nav-link">
+                <i class="bi bi-plus-circle me-2"></i>Add Fruit
+            </a>
+            <a href="../index.html" class="nav-link">
+                <i class="bi bi-shop me-2"></i>View Shop
+            </a>
+        </nav>
+        <div class="mt-auto px-3">
+            <div class="text-white opacity-75 small mb-2 text-center">
+                <i class="bi bi-person-circle me-1"></i><span id="adminName">…</span>
+            </div>
+            <button onclick="logout()" class="btn btn-outline-light btn-sm w-100">
+                <i class="bi bi-box-arrow-right me-1"></i>Logout
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main content -->
+    <div class="admin-content d-flex flex-column w-100">
+        <div class="admin-topbar d-flex align-items-center">
+            <a href="dashboard.html" class="btn btn-sm btn-outline-secondary me-3">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+            <h5 class="mb-0 fw-bold" id="pageTitle">Edit Fruit</h5>
+        </div>
+
+        <div class="p-4" id="mainArea">
+            <div class="text-center py-5">
+                <div class="spinner-border text-success" role="status"></div>
+                <p class="mt-2 text-muted">Loading fruit data…</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const params  = new URLSearchParams(window.location.search);
+const fruitId = parseInt(params.get('id'));
+const CATEGORIES = ['Tropical','Citrus','Berries','Pome Fruits','Stone Fruits','Vine Fruits','Melon','Exotic','General'];
+
+// ── Auth + load ───────────────────────────────────────────────
+async function init() {
+    const auth = await fetch('api/auth.php?action=check').then(r => r.json()).catch(() => ({}));
+    if (!auth.loggedIn) { window.location.href = 'login.html'; return; }
+    document.getElementById('adminName').textContent = auth.username;
+
+    if (!fruitId) { window.location.href = 'dashboard.html'; return; }
+    loadFruit();
+}
+
+async function loadFruit() {
+    try {
+        const data = await fetch(`api/fruits.php?action=get&id=${fruitId}`).then(r => r.json());
+        if (!data.success) throw new Error(data.error || 'Not found');
+        renderForm(data.fruit, data.images);
+    } catch (e) {
+        document.getElementById('mainArea').innerHTML =
+            `<div class="alert alert-danger">Failed to load fruit: ${e.message}</div>`;
+    }
+}
+
+// ── Render form ───────────────────────────────────────────────
+function renderForm(fruit, images) {
+    document.getElementById('pageTitle').textContent = 'Edit: ' + fruit.name;
+    const slotsLeft = 5 - images.length;
+
+    // Existing images HTML
+    let imagesHtml = '';
+    if (images.length > 0) {
+        const cards = images.map(img => `
+            <div class="col-6 col-md-4" id="imgCard_${img.id}">
+                <div class="existing-img-card">
+                    <img src="../${esc(img.image_path)}" alt="">
+                    ${img.is_primary ? '<span class="primary-star"><i class="bi bi-star-fill me-1"></i>Primary</span>' : ''}
+                    <div class="p-1 d-flex gap-1">
+                        ${!img.is_primary ? `<button class="btn btn-xs btn-outline-warning flex-fill"
+                            style="font-size:.7rem;padding:2px"
+                            onclick="setPrimary(${img.id})" title="Set as primary">
+                            <i class="bi bi-star"></i>
+                        </button>` : ''}
+                        <button class="btn btn-xs btn-outline-danger flex-fill"
+                            style="font-size:.7rem;padding:2px"
+                            onclick="deleteImage(${img.id})" title="Delete">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>`).join('');
+
+        imagesHtml = `
+            <div class="admin-card card p-4 mb-3">
+                <h6 class="fw-bold mb-3">
+                    <i class="bi bi-images me-2 text-success"></i>
+                    Current Images (<span id="imgCount">${images.length}</span>/5)
+                </h6>
+                <div class="row g-2" id="imgGrid">${cards}</div>
+            </div>`;
+    }
+
+    const uploadHtml = slotsLeft > 0
+        ? `<div class="admin-card card p-4">
+               <h6 class="fw-bold mb-1">
+                   <i class="bi bi-cloud-upload me-2 text-success"></i>Add Images
+               </h6>
+               <p class="small text-muted mb-3" id="slotsMsg">
+                   ${slotsLeft} slot${slotsLeft !== 1 ? 's' : ''} remaining.
+               </p>
+               <input type="file" id="imageInput" class="form-control"
+                      multiple accept="image/jpeg,image/png,image/gif,image/webp"
+                      onchange="previewImages(this)">
+               <div class="form-text">JPG, PNG, GIF, WEBP — max 5 MB each.</div>
+               <div class="img-preview-grid mt-3" id="previewGrid"></div>
+           </div>`
+        : `<div class="alert alert-warning py-2 small">
+               <i class="bi bi-exclamation-circle me-1"></i>
+               Maximum 5 images reached. Delete one to add more.
+           </div>`;
+
+    // Category options
+    const catOptions = CATEGORIES.map(c =>
+        `<option ${c === fruit.category ? 'selected' : ''}>${esc(c)}</option>`
+    ).join('');
+
+    document.getElementById('mainArea').innerHTML = `
+        <div id="alertBox" class="d-none alert alert-dismissible fade show">
+            <span id="alertText"></span>
+            <button type="button" class="btn-close" onclick="document.getElementById('alertBox').classList.add('d-none')"></button>
+        </div>
+
+        <div id="errorBox" class="alert alert-danger d-none">
+            <ul class="mb-0" id="errorList"></ul>
+        </div>
+
+        <form id="editForm" novalidate>
+            <div class="row g-4">
+
+                <!-- Left -->
+                <div class="col-lg-8">
+                    <div class="admin-card card p-4 mb-4">
+                        <h6 class="fw-bold mb-3">Fruit Information</h6>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Fruit Name <span class="text-danger">*</span></label>
+                            <input type="text" id="name" class="form-control"
+                                   value="${esc(fruit.name)}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Description</label>
+                            <textarea id="description" class="form-control" rows="4">${esc(fruit.description || '')}</textarea>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Price ($) <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" id="price" class="form-control"
+                                           step="0.01" min="0.01"
+                                           value="${parseFloat(fruit.actual_price).toFixed(2)}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Discount (%)</label>
+                                <div class="input-group">
+                                    <input type="number" id="discount" class="form-control"
+                                           step="0.01" min="0" max="100"
+                                           value="${parseFloat(fruit.discount_percentage).toFixed(2)}">
+                                    <span class="input-group-text">%</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Category</label>
+                                <select id="category" class="form-select">${catOptions}</select>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="inStock"
+                                       ${fruit.in_stock ? 'checked' : ''}>
+                                <label class="form-check-label fw-semibold" for="inStock">In Stock</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="btn btn-success px-4 py-2 fw-bold">
+                        <i class="bi bi-check-circle me-2"></i>Save Changes
+                    </button>
+                    <a href="dashboard.html" class="btn btn-outline-secondary ms-2 px-4 py-2">Cancel</a>
+                </div>
+
+                <!-- Right: images -->
+                <div class="col-lg-4">
+                    ${imagesHtml}
+                    ${uploadHtml}
+                </div>
+            </div>
+        </form>`;
+
+    document.getElementById('editForm').addEventListener('submit', submitEdit);
+}
+
+// ── Submit edit ───────────────────────────────────────────────
+async function submitEdit(e) {
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving…';
+
+    const fd = new FormData();
+    fd.append('action',               'update');
+    fd.append('id',                   fruitId);
+    fd.append('name',                 document.getElementById('name').value.trim());
+    fd.append('description',          document.getElementById('description').value.trim());
+    fd.append('actual_price',         document.getElementById('price').value);
+    fd.append('discount_percentage',  document.getElementById('discount').value);
+    fd.append('category',             document.getElementById('category').value);
+    fd.append('in_stock',             document.getElementById('inStock').checked ? '1' : '0');
+
+    const imgInput = document.getElementById('imageInput');
+    if (imgInput) Array.from(imgInput.files).forEach(f => fd.append('images[]', f));
+
+    try {
+        const data = await fetch('api/fruits.php', { method: 'POST', body: fd }).then(r => r.json());
+
+        if (data.success) {
+            showAlert('success', 'Changes saved successfully!');
+            loadFruit();   // Refresh image section
+        } else {
+            showErrors(data.errors || [data.error || 'Save failed.']);
+        }
+    } catch {
+        showErrors(['Connection error. Please try again.']);
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Save Changes';
+}
+
+// ── Delete image ──────────────────────────────────────────────
+async function deleteImage(imageId) {
+    if (!confirm('Delete this image?')) return;
+
+    const fd = new FormData();
+    fd.append('action',   'delete');
+    fd.append('id',       imageId);
+    fd.append('fruit_id', fruitId);
+
+    const data = await fetch('api/images.php', { method: 'POST', body: fd }).then(r => r.json()).catch(() => ({}));
+    if (data.success) {
+        loadFruit();
+    } else {
+        alert(data.error || 'Delete failed.');
+    }
+}
+
+// ── Set primary image ─────────────────────────────────────────
+async function setPrimary(imageId) {
+    const fd = new FormData();
+    fd.append('action',   'set_primary');
+    fd.append('id',       imageId);
+    fd.append('fruit_id', fruitId);
+
+    const data = await fetch('api/images.php', { method: 'POST', body: fd }).then(r => r.json()).catch(() => ({}));
+    if (data.success) {
+        loadFruit();
+    } else {
+        alert(data.error || 'Failed to set primary.');
+    }
+}
+
+// ── Image preview ─────────────────────────────────────────────
+function previewImages(input) {
+    const files = Array.from(input.files).slice(0, 5);
+    const grid  = document.getElementById('previewGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    files.forEach((file, i) => {
+        const reader = new FileReader();
+        reader.onload = e => {
+            const div = document.createElement('div');
+            div.className = 'img-preview-item';
+            div.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+            grid.appendChild(div);
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+// ── Helpers ───────────────────────────────────────────────────
+function showAlert(type, msg) {
+    const box = document.getElementById('alertBox');
+    box.className = `alert alert-${type} alert-dismissible fade show`;
+    document.getElementById('alertText').textContent = msg;
+    box.classList.remove('d-none');
+    box.scrollIntoView({ behavior: 'smooth' });
+}
+function showErrors(errors) {
+    const box  = document.getElementById('errorBox');
+    const list = document.getElementById('errorList');
+    list.innerHTML = errors.map(e => `<li>${e}</li>`).join('');
+    box.classList.remove('d-none');
+    box.scrollIntoView({ behavior: 'smooth' });
+}
+function esc(s) {
+    return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+async function logout() {
+    await fetch('api/auth.php', { method: 'POST', body: new URLSearchParams({ action: 'logout' }) });
+    window.location.href = 'login.html';
+}
+
+init();
+</script>
+</body>
+</html>

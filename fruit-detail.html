@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Fruit Detail – FreshFruits</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- ===== Navbar ===== -->
+<nav class="navbar navbar-expand-lg navbar-dark" style="background:var(--primary)">
+    <div class="container">
+        <a class="navbar-brand" href="index.html">
+            <i class="bi bi-basket2-fill me-2"></i>Fresh<span>Fruits</span>
+        </a>
+        <div class="ms-auto d-flex gap-2">
+            <a href="admin/login.html" class="btn btn-outline-light btn-sm">
+                <i class="bi bi-shield-lock me-1"></i>Admin Login
+            </a>
+        </div>
+    </div>
+</nav>
+
+<!-- ===== Breadcrumb ===== -->
+<div class="bg-white border-bottom py-2">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0 small">
+                <li class="breadcrumb-item"><a href="index.html" class="text-success">Home</a></li>
+                <li class="breadcrumb-item" id="breadcrumbCategory"></li>
+                <li class="breadcrumb-item active" id="breadcrumbName"></li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<!-- ===== Detail Content ===== -->
+<main class="container py-5" id="detailContent">
+    <!-- Injected by JavaScript -->
+</main>
+
+<!-- ===== Footer ===== -->
+<footer class="py-4 mt-4">
+    <div class="container text-center">
+        <p class="mb-1">
+            <i class="bi bi-basket2-fill me-1"></i>
+            <strong class="text-white">FreshFruits</strong> &nbsp;&mdash;&nbsp; Fresh produce, every day.
+        </p>
+        <p class="small mb-0">&copy; 2025 FreshFruits. All rights reserved.</p>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// =====================================================
+// HARDCODED FRUIT DATA
+// =====================================================
+const fruitsData = {
+    1: {
+        id: 1,
+        name: 'Red Apple',
+        category: 'Pome Fruits',
+        description: 'Fresh, crisp red apples sourced from the finest orchards. Rich in dietary fiber and powerful antioxidants, these apples support heart health and aid digestion. Their sweet-tart balance makes them perfect for snacking, baking, juicing, or adding crunch to salads.',
+        actual_price: 2.99,
+        discount: 10,
+        in_stock: true,
+        added_date: 'January 15, 2024',
+        images: [
+            'https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1570913149827-d2ac84ab3f9a?w=800&h=600&fit=crop'
+        ]
+    },
+    2: {
+        id: 2,
+        name: 'Banana',
+        category: 'Tropical',
+        description: 'Sweet and creamy bananas packed with potassium, magnesium, and natural energy. A beloved tropical fruit enjoyed worldwide. Ideal for smoothies, cereal toppings, baking banana bread, or simply peeling and eating on the go.',
+        actual_price: 1.49,
+        discount: 0,
+        in_stock: true,
+        added_date: 'January 16, 2024',
+        images: [
+            'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1481349518771-20055b2a7b24?w=800&h=600&fit=crop'
+        ]
+    },
+    3: {
+        id: 3,
+        name: 'Strawberry',
+        category: 'Berries',
+        description: 'Plump, juicy strawberries bursting with sweet flavor and a beautiful red color. Exceptionally high in vitamin C, folate, and antioxidants. Perfect for desserts, smoothies, fruit salads, or dipped in chocolate.',
+        actual_price: 4.99,
+        discount: 20,
+        in_stock: true,
+        added_date: 'January 18, 2024',
+        images: [
+            'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1543528176-61b239494933?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1518635017498-87f514b751ba?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1601004890657-9fe9e6e79875?w=800&h=600&fit=crop'
+        ]
+    },
+    4: {
+        id: 4,
+        name: 'Mango',
+        category: 'Tropical',
+        description: 'Exotic Alphonso mangoes with a rich, sweet aroma and golden flesh. Rightly called the king of fruits. Loaded with vitamins A and C. Enjoy fresh, blended into lassi, tossed in salsa, or added to tropical desserts.',
+        actual_price: 3.99,
+        discount: 15,
+        in_stock: true,
+        added_date: 'February 1, 2024',
+        images: [
+            'https://images.unsplash.com/photo-1553279768-865429fa0078?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1601493700631-2b16ec4b4716?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1591073113125-e46713c829ed?w=800&h=600&fit=crop'
+        ]
+    },
+    5: {
+        id: 5,
+        name: 'Green Grapes',
+        category: 'Vine Fruits',
+        description: 'Crisp, seedless green grapes that are sweet and refreshing. Rich in resveratrol and natural antioxidants. Perfect for snacking, wine-making, fruit platters, or pairing with cheese on a charcuterie board.',
+        actual_price: 3.49,
+        discount: 5,
+        in_stock: true,
+        added_date: 'February 5, 2024',
+        images: [
+            'https://images.unsplash.com/photo-1537640538966-79f369143f8f?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1596363505729-4190a9506133?w=800&h=600&fit=crop'
+        ]
+    },
+    6: {
+        id: 6,
+        name: 'Orange',
+        category: 'Citrus',
+        description: 'Juicy navel oranges loaded with vitamin C, folate, and potassium. Known for their easy-peel skin and sweet flavour. Perfect for freshly squeezed juice, as a healthy snack, or added to salads and marinades.',
+        actual_price: 1.99,
+        discount: 0,
+        in_stock: true,
+        added_date: 'February 8, 2024',
+        images: [
+            'https://images.unsplash.com/photo-1547514701-42782101795e?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1580052614034-c55d20bfee3b?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1611080626919-7cf5a9dbab12?w=800&h=600&fit=crop'
+        ]
+    },
+    7: {
+        id: 7,
+        name: 'Watermelon',
+        category: 'Melon',
+        description: 'Giant, sweet watermelons that are 92% water and bursting with lycopene, a potent antioxidant. Low in calories and naturally hydrating. The ultimate summer refreshment — slice, cube, or blend into agua fresca.',
+        actual_price: 5.99,
+        discount: 10,
+        in_stock: true,
+        added_date: 'March 1, 2024',
+        images: [
+            'https://images.unsplash.com/photo-1563114773-84221bd62daa?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1589984662646-e7b2e4962f18?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1571680322279-a226e6a4cc2a?w=800&h=600&fit=crop'
+        ]
+    },
+    8: {
+        id: 8,
+        name: 'Blueberries',
+        category: 'Berries',
+        description: 'Premium wild blueberries — tiny powerhouses packed with anthocyanins, vitamins C and K, and fibre. One of the most nutrient-dense foods available. Great in muffins, pancakes, yoghurt, oatmeal, or eaten fresh by the handful.',
+        actual_price: 5.49,
+        discount: 0,
+        in_stock: false,
+        added_date: 'March 5, 2024',
+        images: [
+            'https://images.unsplash.com/photo-1498557850523-fd3d118b962e?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1457296898342-cdd24585d095?w=800&h=600&fit=crop'
+        ]
+    },
+    9: {
+        id: 9,
+        name: 'Pineapple',
+        category: 'Tropical',
+        description: 'Golden pineapples from sun-drenched farms. Naturally sweet and tangy, rich in bromelain which aids digestion and reduces inflammation. Wonderful fresh, grilled on skewers, in tropical cocktails, or as a pizza topping.',
+        actual_price: 3.29,
+        discount: 0,
+        in_stock: true,
+        added_date: 'March 10, 2024',
+        images: [
+            'https://images.unsplash.com/photo-1550258987-190a2d41a8ba?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1565551930928-6df8e02b2e06?w=800&h=600&fit=crop'
+        ]
+    },
+    10: {
+        id: 10,
+        name: 'Kiwi',
+        category: 'Exotic',
+        description: 'Bright green kiwi with a distinctive sweet-tart flavour and a stunning pattern inside. Contains more vitamin C than an orange. Enjoy sliced on its own, in fruit salads, on top of pavlova, or blended into a smoothie.',
+        actual_price: 2.49,
+        discount: 8,
+        in_stock: true,
+        added_date: 'March 12, 2024',
+        images: [
+            'https://images.unsplash.com/photo-1618897996318-5a901fa6ca71?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1585059895524-72359e06133a?w=800&h=600&fit=crop'
+        ]
+    },
+    11: {
+        id: 11,
+        name: 'Peach',
+        category: 'Stone Fruits',
+        description: 'Velvety, sun-ripened peaches with fragrant golden-pink flesh. A wonderful source of vitamins A and C, potassium, and fibre. Sublime eaten fresh, preserved in jams, baked into cobblers, or grilled alongside savoury dishes.',
+        actual_price: 3.79,
+        discount: 12,
+        in_stock: true,
+        added_date: 'March 14, 2024',
+        images: [
+            'https://images.unsplash.com/photo-1595743825637-cdafc8ad4173?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1571680322279-a226e6a4cc2a?w=800&h=600&fit=crop'
+        ]
+    },
+    12: {
+        id: 12,
+        name: 'Lemon',
+        category: 'Citrus',
+        description: 'Bright, zesty lemons packed with vitamin C, citric acid, and a refreshing aroma. An indispensable kitchen staple used in cooking, baking, cocktails, dressings, and freshly squeezed lemonade.',
+        actual_price: 1.29,
+        discount: 0,
+        in_stock: true,
+        added_date: 'March 18, 2024',
+        images: [
+            'https://images.unsplash.com/photo-1590502593747-42a996133562?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1571671332-cd4aeaec8f49?w=800&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1548614606-52b4451f994b?w=800&h=600&fit=crop'
+        ]
+    }
+};
+
+// =====================================================
+// Helpers
+// =====================================================
+function formatPrice(p) {
+    return '$' + p.toFixed(2);
+}
+function discountedPrice(price, disc) {
+    return Math.round((price - price * disc / 100) * 100) / 100;
+}
+
+// =====================================================
+// Switch main image
+// =====================================================
+function switchImage(clickedThumb, src) {
+    document.getElementById('mainImage').src = src;
+    document.querySelectorAll('.thumb-gallery img').forEach(t => t.classList.remove('active'));
+    clickedThumb.classList.add('active');
+}
+
+// =====================================================
+// Render page
+// =====================================================
+function renderDetail() {
+    const params = new URLSearchParams(window.location.search);
+    const id     = parseInt(params.get('id'));
+    const fruit  = fruitsData[id];
+
+    if (!fruit) {
+        window.location.href = 'index.html';
+        return;
+    }
+
+    // Page title
+    document.title = fruit.name + ' – FreshFruits';
+
+    // Breadcrumb
+    document.getElementById('breadcrumbCategory').innerHTML =
+        `<a href="index.html" class="text-success" onclick="sessionStorage.setItem('filterCat','${fruit.category}'); return true;">${fruit.category}</a>`;
+    document.getElementById('breadcrumbName').textContent = fruit.name;
+
+    const finalPrice  = discountedPrice(fruit.actual_price, fruit.discount);
+    const hasDiscount = fruit.discount > 0;
+    const images      = fruit.images;
+    const placeholder = 'https://placehold.co/800x600/e8f5e9/2e7d32?text=' + encodeURIComponent(fruit.name);
+
+    // Thumbnails HTML
+    const thumbsHtml = images.length > 1
+        ? `<div class="thumb-gallery">
+            ${images.map((src, i) => `
+                <img src="${src}"
+                     alt="${fruit.name} photo ${i+1}"
+                     class="${i === 0 ? 'active' : ''}"
+                     onclick="switchImage(this, '${src}')"
+                     onerror="this.style.display='none'">`
+            ).join('')}
+           </div>`
+        : '';
+
+    // All photos grid
+    const allPhotosHtml = images.length > 1
+        ? `<hr class="my-5">
+           <h4 class="fw-bold mb-4"><i class="bi bi-images me-2 text-success"></i>All Photos</h4>
+           <div class="row g-3">
+               ${images.map((src, i) => `
+                   <div class="col-6 col-md-4 col-lg-3">
+                       <img src="${src}"
+                            alt="${fruit.name} photo ${i+1}"
+                            class="img-fluid rounded-3 shadow-sm w-100"
+                            style="height:180px;object-fit:cover;cursor:pointer"
+                            onclick="
+                                document.getElementById('mainImage').src='${src}';
+                                document.querySelectorAll('.thumb-gallery img').forEach((t,idx)=>t.classList.toggle('active',idx===${i}));
+                                window.scrollTo({top:0,behavior:'smooth'})"
+                            onerror="this.parentElement.style.display='none'">
+                   </div>`
+               ).join('')}
+           </div>`
+        : '';
+
+    document.getElementById('detailContent').innerHTML = `
+        <a href="index.html" class="btn btn-outline-success btn-sm mb-4">
+            <i class="bi bi-arrow-left me-1"></i>Back to Shop
+        </a>
+
+        <div class="row g-5">
+
+            <!-- Image gallery -->
+            <div class="col-lg-6">
+                <img id="mainImage"
+                     src="${images[0]}"
+                     class="detail-image-main mb-3"
+                     alt="${fruit.name}"
+                     onerror="this.src='${placeholder}'">
+                ${thumbsHtml}
+            </div>
+
+            <!-- Details -->
+            <div class="col-lg-6">
+                <span class="category-pill mb-2 d-inline-block">${fruit.category}</span>
+                <h1 class="fw-bold mb-3" style="font-size:2rem">${fruit.name}</h1>
+
+                <!-- Pricing box -->
+                <div class="detail-price-box mb-4">
+                    ${hasDiscount ? `
+                        <div class="d-flex align-items-center gap-3 mb-1">
+                            <span class="detail-price-final">${formatPrice(finalPrice)}</span>
+                            <span class="detail-discount-tag">
+                                <i class="bi bi-tag-fill me-1"></i>${fruit.discount}% OFF
+                            </span>
+                        </div>
+                        <div class="detail-price-actual">Original price: ${formatPrice(fruit.actual_price)}</div>
+                        <div class="mt-2 small text-success fw-semibold">
+                            You save: ${formatPrice(fruit.actual_price - finalPrice)}
+                        </div>
+                    ` : `
+                        <div class="detail-price-final">${formatPrice(fruit.actual_price)}</div>
+                    `}
+                    <hr class="my-3">
+                    ${fruit.in_stock
+                        ? `<span class="stock-badge stock-badge-in"><i class="bi bi-check-circle-fill me-1"></i>In Stock</span>`
+                        : `<span class="stock-badge stock-badge-out"><i class="bi bi-x-circle-fill me-1"></i>Out of Stock</span>`
+                    }
+                </div>
+
+                <!-- Description -->
+                <div class="mb-4">
+                    <h5 class="fw-semibold mb-2">
+                        <i class="bi bi-info-circle text-success me-2"></i>About this fruit
+                    </h5>
+                    <p class="text-muted lh-lg">${fruit.description}</p>
+                </div>
+
+                <!-- Meta -->
+                <ul class="list-unstyled small text-muted">
+                    <li class="mb-1">
+                        <i class="bi bi-grid-3x3-gap-fill me-2 text-success"></i>
+                        <strong>Category:</strong> ${fruit.category}
+                    </li>
+                    <li class="mb-1">
+                        <i class="bi bi-images me-2 text-success"></i>
+                        <strong>Photos:</strong> ${images.length} image${images.length !== 1 ? 's' : ''}
+                    </li>
+                    <li>
+                        <i class="bi bi-clock me-2 text-success"></i>
+                        <strong>Added:</strong> ${fruit.added_date}
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        ${allPhotosHtml}
+    `;
+}
+
+renderDetail();
+</script>
+</body>
+</html>

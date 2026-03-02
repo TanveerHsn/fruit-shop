@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Add Fruit – FreshFruits Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+</head>
+<body>
+<div class="d-flex" style="min-height:100vh">
+
+    <!-- Sidebar -->
+    <aside class="admin-sidebar d-flex flex-column py-4">
+        <div class="text-center text-white mb-4 px-3">
+            <i class="bi bi-basket2-fill" style="font-size:2rem"></i>
+            <div class="fw-bold mt-1">FreshFruits</div>
+            <div class="opacity-75 small">Admin Panel</div>
+        </div>
+        <nav class="nav flex-column">
+            <a href="dashboard.html" class="nav-link">
+                <i class="bi bi-speedometer2 me-2"></i>Dashboard
+            </a>
+            <a href="add-fruit.html" class="nav-link active">
+                <i class="bi bi-plus-circle me-2"></i>Add Fruit
+            </a>
+            <a href="../index.html" class="nav-link">
+                <i class="bi bi-shop me-2"></i>View Shop
+            </a>
+        </nav>
+        <div class="mt-auto px-3">
+            <div class="text-white opacity-75 small mb-2 text-center">
+                <i class="bi bi-person-circle me-1"></i><span id="adminName">…</span>
+            </div>
+            <button onclick="logout()" class="btn btn-outline-light btn-sm w-100">
+                <i class="bi bi-box-arrow-right me-1"></i>Logout
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main content -->
+    <div class="admin-content d-flex flex-column w-100">
+        <div class="admin-topbar d-flex align-items-center">
+            <a href="dashboard.html" class="btn btn-sm btn-outline-secondary me-3">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+            <h5 class="mb-0 fw-bold">Add New Fruit</h5>
+        </div>
+
+        <div class="p-4">
+            <div id="errorBox" class="alert alert-danger d-none">
+                <ul class="mb-0" id="errorList"></ul>
+            </div>
+
+            <form id="addForm" novalidate>
+                <div class="row g-4">
+
+                    <!-- Left: fruit info -->
+                    <div class="col-lg-8">
+                        <div class="admin-card card p-4">
+                            <h6 class="fw-bold mb-3">Fruit Information</h6>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Fruit Name <span class="text-danger">*</span></label>
+                                <input type="text" id="name" class="form-control"
+                                       placeholder="e.g. Red Apple" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Description</label>
+                                <textarea id="description" class="form-control" rows="4"
+                                          placeholder="Describe the fruit…"></textarea>
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Price ($) <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" id="price" class="form-control"
+                                               step="0.01" min="0.01" placeholder="0.00" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Discount (%)</label>
+                                    <div class="input-group">
+                                        <input type="number" id="discount" class="form-control"
+                                               step="0.01" min="0" max="100" value="0">
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Category</label>
+                                    <select id="category" class="form-select">
+                                        <option>Tropical</option>
+                                        <option>Citrus</option>
+                                        <option>Berries</option>
+                                        <option>Pome Fruits</option>
+                                        <option>Stone Fruits</option>
+                                        <option>Vine Fruits</option>
+                                        <option>Melon</option>
+                                        <option>Exotic</option>
+                                        <option selected>General</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mt-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox"
+                                           id="inStock" checked>
+                                    <label class="form-check-label fw-semibold" for="inStock">
+                                        In Stock
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: images -->
+                    <div class="col-lg-4">
+                        <div class="admin-card card p-4">
+                            <h6 class="fw-bold mb-1">
+                                <i class="bi bi-images me-2 text-success"></i>Fruit Images
+                            </h6>
+                            <p class="small text-muted mb-3">
+                                Upload up to 5 images. First image becomes the primary photo.
+                            </p>
+
+                            <input type="file" id="imageInput" class="form-control"
+                                   multiple accept="image/jpeg,image/png,image/gif,image/webp"
+                                   onchange="previewImages(this)">
+                            <div class="form-text">JPG, PNG, GIF, WEBP — max 5 MB each.</div>
+
+                            <div class="img-preview-grid mt-3" id="previewGrid"></div>
+                        </div>
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="col-12">
+                        <button type="submit" id="submitBtn"
+                                class="btn btn-success px-4 py-2 fw-bold">
+                            <i class="bi bi-plus-circle me-2"></i>Add Fruit
+                        </button>
+                        <a href="dashboard.html"
+                           class="btn btn-outline-secondary ms-2 px-4 py-2">Cancel</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Auth guard
+async function init() {
+    const auth = await fetch('api/auth.php?action=check').then(r => r.json()).catch(() => ({}));
+    if (!auth.loggedIn) { window.location.href = 'login.html'; return; }
+    document.getElementById('adminName').textContent = auth.username;
+}
+
+// Image preview
+function previewImages(input) {
+    const files = Array.from(input.files).slice(0, 5);
+    const grid  = document.getElementById('previewGrid');
+    grid.innerHTML = '';
+    files.forEach((file, i) => {
+        const reader = new FileReader();
+        reader.onload = e => {
+            const div = document.createElement('div');
+            div.className = 'img-preview-item';
+            div.innerHTML = `<img src="${e.target.result}" alt="Preview">
+                ${i === 0 ? '<span style="position:absolute;bottom:4px;left:4px;background:#2e7d32;color:#fff;font-size:.6rem;padding:2px 6px;border-radius:8px">Primary</span>' : ''}`;
+            grid.appendChild(div);
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+// Form submit
+document.getElementById('addForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Adding…';
+
+    const fd = new FormData();
+    fd.append('action',               'create');
+    fd.append('name',                 document.getElementById('name').value.trim());
+    fd.append('description',          document.getElementById('description').value.trim());
+    fd.append('actual_price',         document.getElementById('price').value);
+    fd.append('discount_percentage',  document.getElementById('discount').value);
+    fd.append('category',             document.getElementById('category').value);
+    fd.append('in_stock',             document.getElementById('inStock').checked ? '1' : '0');
+
+    const imageInput = document.getElementById('imageInput');
+    Array.from(imageInput.files).slice(0, 5).forEach(f => fd.append('images[]', f));
+
+    try {
+        const res  = await fetch('api/fruits.php', { method: 'POST', body: fd });
+        const data = await res.json();
+
+        if (data.success) {
+            sessionStorage.setItem('flash', `Fruit added successfully!`);
+            window.location.href = 'dashboard.html';
+        } else {
+            showErrors(data.errors || [data.error || 'Failed to add fruit.']);
+            resetBtn();
+        }
+    } catch {
+        showErrors(['Connection error. Please try again.']);
+        resetBtn();
+    }
+});
+
+function showErrors(errors) {
+    const box  = document.getElementById('errorBox');
+    const list = document.getElementById('errorList');
+    list.innerHTML = errors.map(e => `<li>${e}</li>`).join('');
+    box.classList.remove('d-none');
+    box.scrollIntoView({ behavior: 'smooth' });
+}
+function resetBtn() {
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="bi bi-plus-circle me-2"></i>Add Fruit';
+}
+async function logout() {
+    await fetch('api/auth.php', { method: 'POST', body: new URLSearchParams({ action: 'logout' }) });
+    window.location.href = 'login.html';
+}
+
+init();
+</script>
+</body>
+</html>
